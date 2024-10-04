@@ -2,46 +2,52 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-K3s_AWS_Infra-blue?style=flat&logo=github)](https://github.com/TheToriqul/K3s-AWS-Infra)
 [![GitHub stars](https://img.shields.io/github/stars/TheToriqul/K3s-AWS-Infra?style=social)](https://github.com/TheToriqul/K3s-AWS-Infra/stargazers)
-[![AWS](https://img.shields.io/badge/AWS-Infrastructure-orange?style=flat&logo=amazon-aws)](https://aws.amazon.com/)
-[![K3s](https://img.shields.io/badge/K3s-v1.30.5-blue?style=flat&logo=kubernetes)](https://k3s.io/)
 
 ## 📋 Description
-A production-ready infrastructure setup for deploying K3s Kubernetes clusters on AWS EC2 instances. This project provides automated deployment of a lightweight Kubernetes distribution using Ubuntu instances in a custom VPC configuration.
+A production-grade infrastructure setup for deploying lightweight Kubernetes clusters on AWS using K3s. This project provides an automated approach to creating a robust, scalable Kubernetes environment while maintaining cost-effectiveness through AWS free tier resources.
 
-## 📁 Project Architecture
-See the project architecture diagram in the repository for a visual representation of the infrastructure setup.
-   <figure >
+## 🏗️ Project Architecture
+<figure>
     <p align="center">
         <img src="./assets/diagram.png" alt="project architecture" />
-        <p align="center">Project Architecture</p> 
+        <p align="center">K3s AWS Infrastructure Architecture</p> 
     </p>
-   </figure>
+</figure>
 
 ## 🛠️ Technologies Used
-- AWS EC2 (t2.micro instances)
-- K3s v1.30.5+k3s1
-- Ubuntu Server 24.04 LTS
-- Custom VPC Setup
-- AWS Security Groups
-- Route Tables & Internet Gateway
+- ![AWS](https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+- ![Kubernetes](https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white)
+- ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+- ![DevOps](https://img.shields.io/badge/DevOps-0A0A0A?style=for-the-badge&logo=dev.to&logoColor=white)
+- ![Shell Script](https://img.shields.io/badge/Shell_Script-121011?style=flat&logo=gnu-bash&logoColor=white)
 
-## ✨ Key Features
-- Automated K3s cluster deployment on AWS
-- Single master and two worker node architecture
-- Secure VPC configuration with public subnet
-- Custom route table configuration
-- Free tier eligible setup
+## ⭐ Key Features
+- Single-master, multi-worker Kubernetes cluster architecture
+- Custom VPC with public subnet configuration
+- Automated node joining process
+- Free tier eligible infrastructure
+- Secure network configuration with custom security groups
 
 ## 📥 Installation
 
-1. VPC Setup:
+<details>
+<summary>View Installation Details</summary>
+
+### Prerequisites
+- AWS Account with appropriate permissions
+- AWS CLI installed and configured
+- Basic knowledge of Kubernetes and AWS
+
+### Step-by-Step Setup
+
+1. VPC Setup
 ```bash
-# Create VPC with following configuration:
+# Create VPC
 VPC Name: K3S-VPC
 IPv4 CIDR: 10.10.0.0/16
 ```
 
-2. Subnet Configuration:
+2. Subnet Configuration
 ```bash
 # Create public subnet
 Name: K3S-Public
@@ -49,90 +55,134 @@ IPv4 CIDR: 10.10.1.0/24
 Availability Zone: ap-southeast-1a
 ```
 
-3. Route Table Setup:
+3. Launch EC2 Instances
 ```bash
-# Create and configure route table
-Name: K3S-RT
-VPC: K3S-VPC
-```
-
-4. Launch EC2 Instances:
-```bash
-# Launch 3 instances with:
+# Launch instances with:
 AMI: Ubuntu Server 24.04 LTS
 Instance Type: t2.micro
 VPC: K3S-VPC
-Subnet: K3S-Public
 ```
+</details>
 
 ## 🚀 Usage
 
-1. Install K3s on Master Node:
-```bash
-curl -sfL https://get.k3s.io | sh -
-```
+<details>
+<summary>View Usage Details</summary>
 
-2. Get Node Token:
+### Master Node Setup
 ```bash
+# Install K3s on master
+curl -sfL https://get.k3s.io | sh -
+
+# Get node token
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-3. Join Worker Nodes (using actual configuration from screenshots):
+### Worker Node Setup
 ```bash
-curl -sfL https://get.k3s.io | K3S_URL=https://10.10.1.196:6443 K3S_TOKEN=K107c3d360260a4d65fb8cb2be3e5b0ea158b5a2f67bd6898ecc895030fb7ce0fa4::server:83ec5905b3dbbb1fc8736ca86a11b2e6 sh -
+# Join worker nodes
+curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER_IP>:6443 K3S_TOKEN=<NODE_TOKEN> sh -
 ```
 
-## ⚙️ Configuration
-1. VPC Configuration:
-   - CIDR: 10.10.0.0/16
-   - Public Subnet: 10.10.1.0/24
-   - Internet Gateway enabled
-   - Route tables configured for internet access
-
-2. Security Group Configuration:
-   - K3s required ports (6443, 80, 443)
-   - SSH access (22)
-   - Inter-node communication
-
-## 🎯 Learning Objectives
-- Understanding Kubernetes architecture and deployment
-- AWS infrastructure management
-- Network security and VPC configuration
-- Container orchestration with K3s
-- Infrastructure as Code principles
-
-## 📚 How to Use This Repository
-
-1. Study the documentation and architecture
-2. Follow step-by-step deployment guides
-3. Experiment with sample applications
-4. Clean up resources:
+### Verify Cluster
 ```bash
+# Check node status
+kubectl get nodes
+```
+</details>
+
+## ⚙️ Configuration
+
+<details>
+<summary>View Configuration Details</summary>
+
+### Security Group Configuration
+Allow inbound traffic:
+- SSH (22)
+- Kubernetes API (6443)
+- Node communication (8472)
+- HTTP/HTTPS (80/443)
+
+### Network Configuration
+- VPC CIDR: 10.10.0.0/16
+- Subnet CIDR: 10.10.1.0/24
+- Route table with internet gateway
+</details>
+
+## 🔧 Troubleshooting
+
+<details>
+<summary>View Troubleshooting Guide</summary>
+
+### Common Issues
+1. **Cannot connect to master node**
+   - Verify security group rules
+   - Check if master node is running
+   - Ensure correct IP address is used
+
+2. **Worker node not joining**
+   - Verify node token is correct
+   - Check network connectivity
+   - Validate security group settings
+
+### Logs to Check
+```bash
+# Check K3s logs
+sudo journalctl -u k3s
+
+# Check K3s agent logs
+sudo journalctl -u k3s-agent
+```
+</details>
+
+## 📚 Learning Objectives
+- Understanding Kubernetes cluster architecture
+- AWS networking and security concepts
+- Infrastructure as Code principles
+- High availability and scalability patterns
+- DevOps best practices
+
+## 🎓 How I Use This Repository
+1. Clone and explore the configuration
+```bash
+git clone https://github.com/TheToriqul/K3s-AWS-Infra.git
+cd K3s-AWS-Infra
+```
+
+2. Clean up resources
+```bash
+# Terminate instances
 aws ec2 terminate-instances --instance-ids <instance-id>
+
+# Delete VPC resources
+aws ec2 delete-vpc --vpc-id <vpc-id>
 ```
 
 ## 📝 Notes
-- Suitable for development and small production environments
-- Regularly update security groups and access controls
-- Monitor AWS costs and resource usage
+- Make sure to replace `<MASTER_IP>` with your actual master node IP address
+- Replace `<NODE_TOKEN>` with the token obtained from the master node
+- Ensure all security group rules are properly configured before proceeding
+- Keep the node token secure and do not share it publicly
 
 ## 🔮 Further Learning
-- Implement automated scaling
-- Add monitoring and logging solutions
+
+- Implement Infrastructure as Code using Terraform
+- Add monitoring with Prometheus and Grafana
+- Implement CI/CD pipelines
 - Explore K3s high availability setup
-- Implement GitOps workflows
-- Add Infrastructure as Code using Terraform
+- Add automated backup solutions
 
 ## 📚 Resources
 - [Poridhi](https://poridhi.io/)
 - [K3s Documentation](https://docs.k3s.io/)
-- [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [AWS Documentation](https://docs.aws.amazon.com/)
+- [Kubernetes Documentation](https://kubernetes.io/docs/home/)
+- [DevOps Best Practices](https://aws.amazon.com/devops/best-practices/)
 
 ## 🤝 Contributing
 1. Fork the repository
 2. Create a feature branch
-3. Commit changes
+3. Commit your changes
 4. Push to the branch
 5. Open a pull request
 
@@ -143,12 +193,14 @@ For any questions or inquiries:
 
 ## 🔗 Project Links
 - [GitHub Repository](https://github.com/TheToriqul/K3s-AWS-Infra)
+- [Issue Tracker](https://github.com/TheToriqul/K3s-AWS-Infra/issues)
 
 ## 🙏 Acknowledgments
 - Poridhi lab team
-- K3s team for the lightweight Kubernetes distribution
-- AWS for the cloud infrastructure platform
-- Open source community contributors
+- K3s development team
+- AWS documentation team
+- Open source community
 
 ---
-Feel free to explore, modify, and expand upon this configuration as part of my learning journey!
+
+Feel free to explore, modify, and build upon this configuration as part of my learning journey. You're also welcome to learn from it, and I wish you the best of luck!
